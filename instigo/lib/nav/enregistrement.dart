@@ -138,6 +138,7 @@ class _PayementState extends State<Payement> {
               content: Text('Enregistrement réussi'),
             ),
           );
+          fetchData();
         } else {
           throw Exception('Failed to insert data');
         }
@@ -421,7 +422,6 @@ class _PayementState extends State<Payement> {
             TextButton(
               onPressed: () {
                 insertData();
-                fetchData();
               },
               child: const Text('Ajouter'),
             ),

@@ -21,31 +21,15 @@ $terri = htmlspecialchars($_POST["Territoire"]);
 $ecoleprov = htmlspecialchars($_POST["EcoleProv"]);
 $dossier = htmlspecialchars($_POST["Dossier"]);
 
-// Vérification s'il y a une image envoyée
-// if(isset($_FILES['profil'])) {
-//     // Récupération des données de l'image
-//     $image = $_FILES['profil'];
-    
-//     // Nom temporaire de l'image
-//     $tmpName = $image['tmp_name'];
-    
-//     // Lecture des données binaires de l'image
-//     $imageData = file_get_contents($tmpName);
-    
-//     // Encodage des données binaires de l'image en base64
-//     $base64Image = base64_encode($imageData);
     
     // Requête SQL pour insérer les données dans la table 'identification' avec l'image
-    $sql = "INSERT INTO identification (nom, postnom, prenom, sexe, DateNaissance, LieuNaissance, EtatCivil, Adresse, Telephone, NomPere, NomMere, ProvOrigine, Territoire, EcoleProv, Dossier, profil) 
-    VALUES ('$nom', '$postnom', '$prenom', '$sexe', '$datenaiss', '$LieuNaiss', '$etat', '$adresse', '$numero', '$nompere', '$nommere', '$prov', '$terri', '$ecoleprov', '$dossier', '$base64Image')";
+    $sql = "INSERT INTO identification (nom, postnom, prenom, sexe, DateNaissance, LieuNaissance, EtatCivil, Adresse, Telephone, NomPere, NomMere, ProvOrigine, Territoire, EcoleProv, Dossier) 
+    VALUES ('$nom', '$postnom', '$prenom', '$sexe', '$datenaiss', '$LieuNaiss', '$etat', '$adresse', '$numero', '$nompere', '$nommere', '$prov', '$terri', '$ecoleprov', '$dossier')";
 
     if(mysqli_query($connect, $sql)){
         echo json_encode("success");
     }else{
         echo json_encode("failed");
     }
-// } else {
-//     // Si aucune image n'est envoyée, renvoyer une réponse d'erreur
-//     echo json_encode("Aucune image envoyée");
-// }
+
 ?>

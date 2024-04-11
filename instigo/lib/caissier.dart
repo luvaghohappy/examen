@@ -116,6 +116,7 @@ class _CaissierState extends State<Caissier> {
             content: Text('Data inserted successfully'),
           ),
         );
+      
       } else {
         print('Failed to insert data. Error: ${response.reasonPhrase}');
         ScaffoldMessenger.of(context).showSnackBar(

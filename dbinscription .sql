@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Hôte : 127.0.0.1
--- Généré le : jeu. 11 avr. 2024 à 14:47
+-- Généré le : jeu. 11 avr. 2024 à 18:17
 -- Version du serveur : 10.4.28-MariaDB
 -- Version de PHP : 8.0.28
 
@@ -59,6 +59,16 @@ CREATE TABLE `caisse` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
+-- Déchargement des données de la table `caisse`
+--
+
+INSERT INTO `caisse` (`id`, `matricule`, `montant`, `DateCaisse`) VALUES
+(1, 'E2024-6616aef2a9839', 50, '2024-04-10'),
+(2, 'E2024-6617f14c93134', 90, '2024-04-10'),
+(3, 'E2024-6618038071e64', 30, '2024-04-11'),
+(4, 'E2024-6616aef2a9839', 70, '2024-04-11');
+
+--
 -- Déclencheurs `caisse`
 --
 DELIMITER $$
@@ -83,32 +93,6 @@ END
 $$
 DELIMITER ;
 DELIMITER $$
-CREATE TRIGGER `calculer_montant_total_journalier` AFTER INSERT ON `caisse` FOR EACH ROW BEGIN
-    DECLARE date_transaction DATE;
-    DECLARE total_montant DECIMAL(10,2);
-
-    -- Récupérer la date de la transaction
-    SET date_transaction = NEW.DateCaisse;
-
-    -- Calculer le total des montants pour cette date
-    SELECT SUM(montant) INTO total_montant
-    FROM caisse
-    WHERE DateCaisse = date_transaction;
-
-    -- Mettre à jour le champ montanttotal dans la table rapportcaisse
-    -- Si aucune entrée pour cette date n'existe, insérer une nouvelle ligne
-    IF EXISTS (SELECT 1 FROM rapportcaisse WHERE Dates = date_transaction) THEN
-        UPDATE rapportcaisse
-        SET MontantTotal = total_montant
-        WHERE Dates = date_transaction;
-    ELSE
-        INSERT INTO rapportcaisse (Dates, MontantTotal)
-        VALUES (date_transaction, total_montant);
-    END IF;
-END
-$$
-DELIMITER ;
-DELIMITER $$
 CREATE TRIGGER `calculer_rapport_caisse` AFTER INSERT ON `caisse` FOR EACH ROW BEGIN
     DECLARE total_journalier DECIMAL(10, 2);
 
@@ -117,10 +101,14 @@ CREATE TRIGGER `calculer_rapport_caisse` AFTER INSERT ON `caisse` FOR EACH ROW B
     FROM caisse
     WHERE DateCaisse = NEW.DateCaisse;
 
-    -- Insertion du rapport dans la table RapportCaisse
-    INSERT INTO rapportcaisse (Dates, TotalJournalier)
-    VALUES (NEW.DateCaisse, total_journalier)
-    ON DUPLICATE KEY UPDATE TotalJournalier = total_journalier;
+    -- Vérifier si la date existe déjà dans la table rapportcaisse
+    IF EXISTS (SELECT 1 FROM rapportcaisse WHERE Dates = NEW.DateCaisse) THEN
+        -- Mise à jour du montant pour la date existante
+        UPDATE rapportcaisse SET TotalJournalier = total_journalier WHERE Dates = NEW.DateCaisse;
+    ELSE
+        -- Insertion du rapport dans la table RapportCaisse si la date n'existe pas encore
+        INSERT INTO rapportcaisse (Dates, TotalJournalier) VALUES (NEW.DateCaisse, total_journalier);
+    END IF;
 END
 $$
 DELIMITER ;
@@ -143,7 +131,9 @@ CREATE TABLE `classe` (
 --
 
 INSERT INTO `classe` (`id`, `designation`, `section`, `options`) VALUES
-(1, '8ieme', 'elementaire', 'elementaire');
+(1, '8ieme', 'elementaire', 'elementaire'),
+(2, '7ieme', 'elementaire', 'elemenatire'),
+(3, '1iere', 'technique', 'commercial');
 
 -- --------------------------------------------------------
 
@@ -168,7 +158,9 @@ CREATE TABLE `eleve` (
 --
 
 INSERT INTO `eleve` (`id`, `matricule`, `nom`, `postnom`, `prenom`, `classe`, `section`, `options`, `AnneScolaire`) VALUES
-(1, 'E2024-6616aef2a9839', 'kasoki', 'luvagho', 'furaha', '8ieme', 'elementaire', 'elementaire', '2020-2021');
+(1, 'E2024-6616aef2a9839', 'kasoki', 'luvagho', 'furaha', '8ieme', 'elementaire', 'elementaire', '2020-2021'),
+(2, 'E2024-6617f14c93134', 'moise', 'musa', 'moses', '1iere', 'technique', 'commercial', '2020-2021'),
+(3, 'E2024-6618038071e64', 'bless', 'muji', 'fafa', '7ieme', 'elementaire', 'elementaire', '2021-2022');
 
 --
 -- Déclencheurs `eleve`
@@ -220,6 +212,13 @@ CREATE TABLE `identification` (
   `Dossier` varchar(100) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
+--
+-- Déchargement des données de la table `identification`
+--
+
+INSERT INTO `identification` (`id`, `nom`, `postnom`, `prenom`, `sexe`, `DateNaissance`, `LieuNaissance`, `EtatCivil`, `Adresse`, `Telephone`, `NomPere`, `NomMere`, `ProvOrigine`, `Territoire`, `EcoleProv`, `Dossier`) VALUES
+(1, 'kasoki', 'luvagho', 'furaha', 'M', '2024-04-11', 'goma', 'celibatiare', 'majengo', '+988777766', 'mon pere', 'ma mere', 'ituri', 'lubero', 'majnego', 'bulletin');
+
 -- --------------------------------------------------------
 
 --
@@ -245,7 +244,23 @@ INSERT INTO `operation` (`id`, `service`, `date_heure`) VALUES
 (19, 'Caissier: Insertion dans la table caisse', '2024-04-11 14:23:20'),
 (20, 'Caissier: Insertion dans la table caisse', '2024-04-11 14:27:49'),
 (21, 'Caissier: Insertion dans la table caisse', '2024-04-11 14:35:49'),
-(22, 'Caissier: Suppression dans la table caisse', '2024-04-11 14:36:09');
+(22, 'Caissier: Suppression dans la table caisse', '2024-04-11 14:36:09'),
+(25, 'Secretaire : Insertion dans la table eleve', '2024-04-11 16:18:52'),
+(26, 'Comptable : Insertion dans la table paiement', '2024-04-11 16:21:21'),
+(30, 'Caissier: Insertion dans la table caisse', '2024-04-11 16:30:00'),
+(31, 'Caissier: Insertion dans la table caisse', '2024-04-11 16:30:41'),
+(32, 'Caissier: Insertion dans la table caisse', '2024-04-11 16:30:41'),
+(33, 'Secretaire : Insertion dans la table eleve', '2024-04-11 17:36:32'),
+(34, 'Comptable : Insertion dans la table paiement', '2024-04-11 17:38:22'),
+(35, 'Comptable : Insertion dans la table paiement', '2024-04-11 17:39:24'),
+(36, 'Caissier: Insertion dans la table caisse', '2024-04-11 17:53:04'),
+(37, 'Caissier: Insertion dans la table caisse', '2024-04-11 17:53:04'),
+(38, 'Caissier: Insertion dans la table caisse', '2024-04-11 17:53:04'),
+(39, 'Caissier: Insertion dans la table caisse', '2024-04-11 17:53:04'),
+(40, 'Caissier: Insertion dans la table caisse', '2024-04-11 18:00:54'),
+(41, 'Caissier: Insertion dans la table caisse', '2024-04-11 18:00:54'),
+(42, 'Caissier: Insertion dans la table caisse', '2024-04-11 18:00:54'),
+(43, 'Caissier: Insertion dans la table caisse', '2024-04-11 18:00:54');
 
 -- --------------------------------------------------------
 
@@ -270,7 +285,10 @@ CREATE TABLE `paiement` (
 --
 
 INSERT INTO `paiement` (`id`, `matricule`, `nom`, `postnom`, `prenom`, `classe`, `MotifPaiement`, `montant`, `DatePaiement`) VALUES
-(1, 'E2024-6616aef2a9839', 'kasoki', 'luvagho', 'furaha', '8ieme', 'frais scolaire', 50, '2024-04-10');
+(1, 'E2024-6616aef2a9839', 'kasoki', 'luvagho', 'furaha', '8ieme', 'frais scolaire', 50, '2024-04-10'),
+(2, 'E2024-6617f14c93134', 'moise', 'musa', 'moses', '1iere', 'frais inscription', 90, '2024-04-10'),
+(3, 'E2024-6618038071e64', 'bless', 'muji', 'fafa', '7ieme', 'frais scolaire', 30, '2024-04-11'),
+(4, 'E2024-6616aef2a9839', 'kasoki', 'luvagho', 'furaha', '8ieme', 'frais scolaire', 70, '2024-04-11');
 
 --
 -- Déclencheurs `paiement`
@@ -316,6 +334,14 @@ CREATE TABLE `rapportcaisse` (
   `TotalJournalier` float NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
+--
+-- Déchargement des données de la table `rapportcaisse`
+--
+
+INSERT INTO `rapportcaisse` (`id`, `Dates`, `TotalJournalier`) VALUES
+(1, '2024-04-10', 140),
+(2, '2024-04-11', 100);
+
 -- --------------------------------------------------------
 
 --
@@ -328,6 +354,7 @@ CREATE TABLE `recouvrement` (
   `postnom` varchar(100) NOT NULL,
   `prenom` varchar(50) NOT NULL,
   `classe` varchar(50) NOT NULL,
+  `DatePaiement` float NOT NULL,
   `montant` float NOT NULL,
   `Total` float NOT NULL,
   `DateRecouvrement` date NOT NULL
@@ -337,8 +364,10 @@ CREATE TABLE `recouvrement` (
 -- Déchargement des données de la table `recouvrement`
 --
 
-INSERT INTO `recouvrement` (`id`, `nom`, `postnom`, `prenom`, `classe`, `montant`, `Total`, `DateRecouvrement`) VALUES
-(1, 'kasoki', 'luvagho', 'furaha', '8ieme', 50, 50, '2024-04-10');
+INSERT INTO `recouvrement` (`id`, `nom`, `postnom`, `prenom`, `classe`, `DatePaiement`, `montant`, `Total`, `DateRecouvrement`) VALUES
+(1, 'bless', 'muji', 'fafa', '7ieme', 30, 30, 2024, '2024-04-11'),
+(2, 'kasoki', 'luvagho', 'furaha', '8ieme', 50, 120, 2024, '2024-04-11'),
+(3, 'kasoki', 'luvagho', 'furaha', '8ieme', 70, 120, 2024, '2024-04-11');
 
 -- --------------------------------------------------------
 
@@ -358,7 +387,9 @@ CREATE TABLE `solde` (
 --
 
 INSERT INTO `solde` (`id`, `matricule`, `somme`, `Datepayement`) VALUES
-(1, 'E2024-6616aef2a9839', 50, '2024-04-10');
+(1, 'E2024-6616aef2a9839', 120, '2024-04-11'),
+(2, 'E2024-6617f14c93134', 90, '2024-04-10'),
+(3, 'E2024-6618038071e64', 30, '2024-04-11');
 
 -- --------------------------------------------------------
 
@@ -377,10 +408,11 @@ CREATE TABLE `user` (
 --
 
 INSERT INTO `user` (`id`, `email`, `passwords`) VALUES
-(2, 'sec@gmail.com', 'secretaire'),
-(3, 'admin@gmail.com', 'Admin'),
-(4, 'caisse@gmail.com', 'caissier'),
-(7, 'compte@gmail.com', 'comptable');
+(8, 'com', 'com'),
+(9, 'com', 'com'),
+(10, 'sec', 'sec'),
+(11, 'caisse', 'caisse'),
+(12, 'a', 'a');
 
 --
 -- Index pour les tables déchargées
@@ -454,61 +486,61 @@ ALTER TABLE `user`
 -- AUTO_INCREMENT pour la table `caisse`
 --
 ALTER TABLE `caisse`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
 
 --
 -- AUTO_INCREMENT pour la table `classe`
 --
 ALTER TABLE `classe`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
 
 --
 -- AUTO_INCREMENT pour la table `eleve`
 --
 ALTER TABLE `eleve`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
 
 --
 -- AUTO_INCREMENT pour la table `identification`
 --
 ALTER TABLE `identification`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
 
 --
 -- AUTO_INCREMENT pour la table `operation`
 --
 ALTER TABLE `operation`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=25;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=44;
 
 --
 -- AUTO_INCREMENT pour la table `paiement`
 --
 ALTER TABLE `paiement`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
 
 --
 -- AUTO_INCREMENT pour la table `rapportcaisse`
 --
 ALTER TABLE `rapportcaisse`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
 
 --
 -- AUTO_INCREMENT pour la table `recouvrement`
 --
 ALTER TABLE `recouvrement`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
 
 --
 -- AUTO_INCREMENT pour la table `solde`
 --
 ALTER TABLE `solde`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
 
 --
 -- AUTO_INCREMENT pour la table `user`
 --
 ALTER TABLE `user`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=8;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=13;
 COMMIT;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;

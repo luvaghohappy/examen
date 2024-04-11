@@ -20,7 +20,7 @@ class _AdminState extends State<Admin> {
   //insert data
   //
   //
-  Future<List> insertData() async {
+ Future<List> insertData() async {
     final response = await http.post(
       Uri.parse("http://localhost:81/inscription/insertclasse.php"),
       body: {
@@ -41,6 +41,9 @@ class _AdminState extends State<Admin> {
           content: Text('Enregistrement réussi'),
         ),
       );
+
+      // Charger à nouveau les données
+      fetchData();
     } else {
       // Afficher un message d'erreur en cas d'échec
       ScaffoldMessenger.of(context).showSnackBar(

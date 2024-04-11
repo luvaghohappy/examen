@@ -14,7 +14,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET') {
         $amount = $_GET['amount'];
 
         // Requête SQL pour sélectionner les paiements des élèves de la classe spécifiée
-        $sql = "SELECT p.nom, p.postnom, p.prenom, p.classe,p.montant, s.somme as total_solde 
+        $sql = "SELECT p.nom, p.postnom, p.prenom, p.classe,p.montant,p.DatePaiement, s.somme as total_solde 
                 FROM paiement p
                 INNER JOIN solde s ON p.matricule = s.matricule
                 WHERE p.classe = '$class'";
@@ -42,11 +42,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET') {
                 $postnom = mysqli_real_escape_string($connect, $row['postnom']);
                 $prenom = mysqli_real_escape_string($connect, $row['prenom']);
                 $classe = mysqli_real_escape_string($connect, $row['classe']);
+                $datep = mysqli_real_escape_string($connect, $row['DatePaiement']);
                 $montant = mysqli_real_escape_string($connect, $row['montant']);
-                $total = mysqli_real_escape_string($connect, $row['total_solde']); // Utiliser 'total_solde' au lieu de 'montant'
+                $total = mysqli_real_escape_string($connect, $row['total_solde']);
+               // Utiliser 'total_solde' au lieu de 'montant'
                 $date = date('Y-m-d'); // Date actuelle
 
-                $insertQuery = "INSERT INTO recouvrement (nom, postnom, prenom, classe, montant,Total, DateRecouvrement) VALUES ('$nom', '$postnom', '$prenom', '$classe', '$montant','$total', '$date')";
+                $insertQuery = "INSERT INTO recouvrement (nom, postnom, prenom, classe,DatePaiement,montant,Total, DateRecouvrement) VALUES ('$nom', '$postnom', '$prenom', '$classe', '$montant','$total','$datep', '$date')";
                 $insertResult = mysqli_query($connect, $insertQuery);
 
                 // Vérification des erreurs d'insertion

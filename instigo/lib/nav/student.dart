@@ -86,6 +86,17 @@ class _RecouvrementState extends State<Recouvrement> {
                 ),
               ),
             ),
+             const SizedBox(
+                height: 40), // Espace entre le DataTable et le MontantTotal
+            Text(
+              'DateRecouvrement: $currentDate', // Affichage du MontantTotal
+              style: const TextStyle(
+                fontSize: 17,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+             const SizedBox(
+                height: 40), 
             const Padding(padding: EdgeInsets.only(top: 20)),
             SingleChildScrollView(
               scrollDirection: Axis.horizontal,
@@ -95,6 +106,7 @@ class _RecouvrementState extends State<Recouvrement> {
                   DataColumn(label: Text('Postnom')),
                   DataColumn(label: Text('Prenom')),
                   DataColumn(label: Text('classe')),
+                  DataColumn(label: Text('DatePaiement')),
                   DataColumn(label: Text('Montant')),
                   DataColumn(label: Text('Total')),
                 ],
@@ -104,21 +116,20 @@ class _RecouvrementState extends State<Recouvrement> {
                     DataCell(Text(item['postnom'] ?? '')),
                     DataCell(Text(item['prenom'] ?? '')),
                     DataCell(Text(item['classe'] ?? '')),
-                    DataCell(Text(item['montant'] != null ? item['montant'].toString() : '')),
-                    DataCell(Text(item['total_solde'] != null ? item['total_solde'].toString() : '')),
+                    DataCell(Text(item['DatePaiement'] != null
+                        ? item['DatePaiement'].toString()
+                        : '')),
+                    DataCell(Text(item['montant'] != null
+                        ? item['montant'].toString()
+                        : '')),
+                    DataCell(Text(item['total_solde'] != null
+                        ? item['total_solde'].toString()
+                        : '')),
                   ]);
                 }).toList(),
               ),
             ),
-            const SizedBox(
-                height: 40), // Espace entre le DataTable et le MontantTotal
-            Text(
-              'DateRecouvrement: $currentDate', // Affichage du MontantTotal
-              style: const TextStyle(
-                fontSize: 17,
-                fontWeight: FontWeight.bold,
-              ),
-            ),
+           
             const Padding(padding: EdgeInsets.only(top: 60)),
             Padding(
               padding: const EdgeInsets.all(18.0),

@@ -140,7 +140,7 @@ class _SecretaireState extends State<Secretaire> {
   //selecte image
   // Uint8List? _imageBytes;
   // Uint8List? _imageData;
-  // late html.File _selectedFile; 
+  // late html.File _selectedFile;
   // String? _imageBase64;// Variable pour stocker le fichier sélectionné
 
   // Future<void> _getImage() async {
@@ -221,6 +221,21 @@ class _SecretaireState extends State<Secretaire> {
     return [];
   }
 
+  //
+  Future<Map<String, dynamic>> getLastRecord() async {
+    final response = await http.get(
+      Uri.parse("http://localhost:81/inscription/dernier.php"),
+    );
+    if (response.statusCode == 200) {
+      // Parsez la réponse JSON pour obtenir les données du dernier enregistrement
+      final Map<String, dynamic> data = jsonDecode(response.body);
+      return data;
+    } else {
+      throw Exception(
+          'Erreur lors de la récupération des données du dernier enregistrement');
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final h = MediaQuery.of(context).size.height;
@@ -242,8 +257,48 @@ class _SecretaireState extends State<Secretaire> {
                   padding: EdgeInsets.only(left: 30),
                   child: Text(
                     'IDENTIFICATION ELEVE',
-                    style:
-                        TextStyle(fontWeight: FontWeight.bold, fontSize: 17),
+                    style: TextStyle(fontWeight: FontWeight.bold, fontSize: 17),
+                  ),
+                ),
+                const Padding(padding: EdgeInsets.only(top: 10)),
+                ListTile(
+                  leading: IconButton(
+                    onPressed: () async {
+                      try {
+                        // Récupérez les données du dernier enregistrement
+                        final Map<String, dynamic> lastRecord =
+                            await getLastRecord();
+                        // Mettez à jour les champs de texte avec les données du dernier enregistrement
+                        setState(() {
+                          txtnom.text = lastRecord['nom'];
+                          txtpostnom.text = lastRecord['postnom'];
+                          txtprenom.text = lastRecord['prenom'];
+                          txtsexe.text = lastRecord['sexe'];
+                          txtdatenaiss.text = lastRecord['DateNaissance'];
+                          txtlieunaiss.text = lastRecord['LieuNaissance'];
+                          txtetat.text = lastRecord['EtatCivil'];
+                          txtadresse.text = lastRecord['Adresse'];
+                          txtnumero.text = lastRecord['Telephone'];
+                          txtnompere.text = lastRecord['NomPere'];
+                          txtnommere.text = lastRecord['NomMere'];
+                          txtprov.text = lastRecord['ProvOrigine'];
+                          txtterritoire.text = lastRecord['Territoire'];
+                          txtecoleprov.text = lastRecord['EcoleProv'];
+                          txtdossier.text = lastRecord['Dossier'];
+                          // Mettez à jour les autres champs de texte de la même manière
+                        });
+                      } catch (e) {
+                        // Gérez les erreurs ici
+                        print('Erreur: $e');
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          const SnackBar(
+                            content: Text(
+                                'Erreur lors du chargement du dernier enregistrement'),
+                          ),
+                        );
+                      }
+                    },
+                    icon: const Icon(Icons.arrow_back),
                   ),
                 ),
                 Padding(
@@ -511,26 +566,6 @@ class _SecretaireState extends State<Secretaire> {
                         labelText: 'Dossier'),
                   ),
                 ),
-                // const Padding(padding: EdgeInsets.only(top: 10)),
-                // Padding(
-                //   padding: const EdgeInsets.only(left: 350),
-                //   child: Container(
-                //     height: 70,
-                //     width: 90,
-                //     decoration: BoxDecoration(
-                //       borderRadius: BorderRadius.circular(8.0),
-                //       border: Border.all(color: Colors.black),
-                //     ),
-                //     child: _imageData != null
-                //         ? Image.memory(
-                //             _imageData!) // Affiche l'image si _imageData est non nul
-                //         : IconButton(
-                //           iconSize: 17,
-                //             onPressed: _getImage,
-                //             icon: const Icon(Icons.file_upload),
-                //           ),
-                //   ),
-                // ),
                 const Padding(
                   padding: EdgeInsets.only(top: 30),
                 ),

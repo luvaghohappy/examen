@@ -96,6 +96,7 @@ class _IscrireState extends State<Iscrire> {
             content: Text('Enregistrement réussi'),
           ),
         );
+        fetchData();
       } else {
         // Vérifier si la réponse indique que l'insertion est interdite
         if (response.body ==
