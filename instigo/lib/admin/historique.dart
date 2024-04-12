@@ -42,41 +42,48 @@ class _HistoriqueState extends State<Historique> {
       appBar: AppBar(
         backgroundColor: Colors.black,
         centerTitle: true,
-        title: const Text('Journal des Operations'),
+        title: const Text('Historique des Operations'),
       ),
       body: SingleChildScrollView(
         child: Column(
           children: [
-            const Padding(padding: EdgeInsets.only(left: 20)),
-            DataTable(
-              columns: const [
-                DataColumn(
-                  label: Text('services et operations'),
-                ),
-                DataColumn(
-                  label: Text('date_heure'),
-                ),
-              ],
-              rows: items.map<DataRow>((item) {
-                return DataRow(
-                  color: MaterialStateColor.resolveWith(
-                    (states) {
-                      // Mettez ici la couleur que vous souhaitez pour la première ligne
-                      return Colors.grey.shade200;
-                    },
-                  ),
-                  cells: [
-                    DataCell(
-                      Text(
-                        item['service'].toString(),
-                      ),
+            const Padding(padding: EdgeInsets.only(left: 50)),
+            Container(
+              height: 1325,
+              width: 1350,
+              color: Colors.grey.shade100,
+              child: Card(
+                child: DataTable(
+                  columns: const [
+                    DataColumn(
+                      label: Text('services et operations'),
                     ),
-                    DataCell(
-                      Text(item['date_heure']),
+                    DataColumn(
+                      label: Text('date_heure'),
                     ),
                   ],
-                );
-              }).toList(),
+                  rows: items.map<DataRow>((item) {
+                    return DataRow(
+                      color: MaterialStateColor.resolveWith(
+                        (states) {
+                          // Mettez ici la couleur que vous souhaitez pour la première ligne
+                          return Colors.grey.shade200;
+                        },
+                      ),
+                      cells: [
+                        DataCell(
+                          Text(
+                            item['service'].toString(),
+                          ),
+                        ),
+                        DataCell(
+                          Text(item['date_heure']),
+                        ),
+                      ],
+                    );
+                  }).toList(),
+                ),
+              ),
             ),
           ],
         ),

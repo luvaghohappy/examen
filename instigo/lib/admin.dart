@@ -297,7 +297,7 @@ class _AdminState extends State<Admin> {
           children: [
             DrawerHeader(
               decoration: const BoxDecoration(
-                color: Colors.black38, // Couleur de fond souhaitée
+                color: Colors.black, // Couleur de fond souhaitée
               ),
               child: Column(
                 children: const [
